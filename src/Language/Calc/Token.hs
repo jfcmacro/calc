@@ -1,18 +1,16 @@
 module Language.Calc.Token(Tokens
-                          ,Token(..)
-                          ,isTknInt) where
+                          ,Token(..)) where
+
+import Text.Parsec.Pos(SourcePos)
 
 type Tokens = [Token]
 
-data Token = TknInt Int
-           | TknSMem
-           | TknRMem
-           | TknOp Char
-           | TknEOF
-           | TknOPar
-           | TknCPar
+data Token = TknInt Int SourcePos
+           | TknSMem SourcePos
+           | TknRMem SourcePos
+           | TknOp Char SourcePos
+           | TknEOF SourcePos
+           | TknOPar SourcePos
+           | TknCPar SourcePos
              deriving (Show)
 
-isTknInt :: Token -> Bool
-isTknInt (TknInt _) = True
-isTknInt _          = False

@@ -7,9 +7,3 @@ import Language.Calc.Expr
 
 type Parser = Parsec Tokens ()
 
-pInt :: Parser Expr
-pInt =
-
-pSatisfy :: (Token -> Bool) Parser Token
-pSatisfy f = tokenPrim (\c -> show [c])
-                       (\pos c _ cs -> updatePos

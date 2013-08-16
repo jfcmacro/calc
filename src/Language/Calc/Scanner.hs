@@ -2,6 +2,7 @@ module Language.Calc.Scanner where
 
 import Text.Parsec
 import Text.Parsec.String
+import Text.Parsec.Pos(SourcePos)
 import Language.Calc.Token(Tokens, Token(..))
 
 pTokens :: Parser [Token]
@@ -13,6 +14,7 @@ pToken =  sepBy  (choice [pTknInt, pTknOp, pTknMem, pTknOPar, pTknCPar]) spaces
                  
 pTknInt :: Parser Token
 pTknInt = do i  <- oneOf "123456789"
+             pos <- 
              is <- many digit
              -- spaces
              return $ TknInt (read (i:is))
