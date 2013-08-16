@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                calc
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Another calculator interpreter
 -- description:         
 homepage:            http://www1.eafit.edu.co/fcardona
@@ -19,7 +19,7 @@ executable calc
   main-is:             Main.hs
   hs-source-dirs:      src
   other-modules:       
-  build-depends:       base >=4.5
+  build-depends:       base >=4.5, parsec >= 3.1, mtl >= 2.1
 
 source-repository head
   type:	    git

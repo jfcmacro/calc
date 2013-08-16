@@ -3,47 +3,59 @@ module Language.Calc.Scanner where
 import Text.Parsec
 import Text.Parsec.String
 import Text.Parsec.Pos(SourcePos)
-import Language.Calc.Token(Tokens, Token(..))
+import Language.Calc.Token(Tokens, Token, Tok(..))
+import Control.Monad.State(get)
 
-pTokens :: Parser [Token]
+
+getPos :: Parser SourcePos
+getPos = do s <- getParserState
+            return $ statePos s
+
+pTokens :: Parser Tokens
 pTokens = do l <- pToken
-             return $ l++[TknEOF]
+             ini <- getPos
+             return $ l++[(ini, TknEOF)]
 
 pToken :: Parser [Token]
 pToken =  sepBy  (choice [pTknInt, pTknOp, pTknMem, pTknOPar, pTknCPar]) spaces
                  
 pTknInt :: Parser Token
-pTknInt = do i  <- oneOf "123456789"
-             pos <- 
+pTknInt = do ini <- getPos 
+             i  <- oneOf "123456789" 
              is <- many digit
-             -- spaces
-             return $ TknInt (read (i:is))
+             return $ (ini, TknInt (read (i:is)))
 
 pTknOp :: Parser Token
-pTknOp = do o <- oneOf "+*-/"
-            -- spaces
-            return $ TknOp o
+pTknOp = do ini <- getPos 
+            o <- oneOf "+*-/"
+            return $ (ini, TknOp o)
 
 pTknMem :: Parser Token
-pTknMem = do o <- oneOf "S"
+pTknMem = do ini <- getPos 
+             o <- oneOf "S"
              -- spaces
-             return $ TknSMem
+             return $ (ini, TknSMem)
           <|>
-         do o <- oneOf "R"
+         do ini <- getPos 
+            o <- oneOf "R"
             -- spaces
-            return $ TknRMem
+            return $ (ini, TknRMem)
 
 pTknOPar :: Parser Token
-pTknOPar = do o <- oneOf "("
+pTknOPar = do ini <- getPos 
+              o <- oneOf "("
               -- spaces
-              return $ TknOPar
+              return $ (ini, TknOPar)
 
 pTknCPar :: Parser Token
-pTknCPar = do o <- oneOf ")"
+pTknCPar = do ini <- getPos 
+              o <- oneOf ")"
               -- spaces
-              return $ TknCPar
+              return $ (ini, TknCPar)
 
 pTknEOF :: Parser Token
-pTknEOF = eof >> (return $ TknEOF)
+pTknEOF = do ini <- getPos 
+             eof
+             return $ (ini, TknEOF)
 
 

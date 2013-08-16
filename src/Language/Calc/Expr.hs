@@ -1,4 +1,4 @@
-module Language.Calc.Expr where
+module Language.Calc.Expr(Expr(..)) where
 
 data Expr = EInt Int
           | ERead

@@ -1,16 +1,18 @@
 module Language.Calc.Token(Tokens
-                          ,Token(..)) where
+                          ,Token, Tok(..)) where
 
 import Text.Parsec.Pos(SourcePos)
 
 type Tokens = [Token]
 
-data Token = TknInt Int SourcePos
-           | TknSMem SourcePos
-           | TknRMem SourcePos
-           | TknOp Char SourcePos
-           | TknEOF SourcePos
-           | TknOPar SourcePos
-           | TknCPar SourcePos
-             deriving (Show)
+type Token = (SourcePos, Tok)
+
+data Tok = TknInt Int
+         | TknSMem
+         | TknRMem
+         | TknOp Char
+         | TknEOF
+         | TknOPar
+         | TknCPar
+         deriving (Show)
 
