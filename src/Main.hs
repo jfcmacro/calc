@@ -5,24 +5,13 @@ import Language.Calc.Scanner
 import Language.Calc.Token
 import Language.Calc.Expr
 import Language.Calc.Eval
+import Language.Calc.Options
 import System.Environment(getArgs)
 import Data.Version(Version(..), showVersion)
 import System.Console.GetOpt
 import System.IO(hPutStrLn, stdout, stderr)
 import Paths_calc(version)
 
-data Options =  Options { optShowVersion   :: Bool
-                        , optShowOutScan   :: Bool
-                        , optShowOutParser :: Bool
-                        , optShowHelp      :: Bool
-                        } deriving Show
-
-defaultOptions :: Options
-defaultOptions =  Options { optShowVersion   = False
-                          , optShowOutScan   = False
-                          , optShowOutParser = False
-                          , optShowHelp      = False
-                          }
 
 options :: [OptDescr (Options -> Options)]
 options =
@@ -50,12 +39,11 @@ compilerOpts argv =
     (_,_,errs) -> ioError (userError (concat errs ++ usageInfo header options))
     where header = helpHeader
 
-
 main :: IO ()
 main = do
   (opts, fls) <- (getArgs >>= compilerOpts)
   if (optShowHelp opts)
    then hPutStrLn stdout $ usageInfo helpHeader options
-   else runEval
+   else runEval opts
 
   

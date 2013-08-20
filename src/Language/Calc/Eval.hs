@@ -4,6 +4,7 @@ import Language.Calc.Token
 import Language.Calc.Expr
 import Language.Calc.Scanner
 import Language.Calc.Parser
+import Language.Calc.Options
 import Control.Monad
 import Control.Monad.State
 import System.IO(hPutStrLn, hPutStr, hFlush, hIsEOF, hGetLine, stdout, stderr, stdin)
@@ -28,8 +29,11 @@ evalExpr2 op lexpr rexpr = do l <- evalExpr lexpr
                               r <- evalExpr rexpr
                               return $ (l `op` r) 
 
-callEval :: Expr -> EvalState ()
-callEval expr = do
+callEval :: Options -> Expr -> EvalState ()
+callEval opts expr = do
+  if optShowOutParser opts
+  then lift $ putStrLn $ show expr
+  else return () 
   put 0
   r <- evalExpr expr
   lift $ hPutStrLn stdout $ show r
@@ -37,21 +41,24 @@ callEval expr = do
 errParser :: ParseError -> EvalState ()
 errParser e = lift $ hPutStrLn stderr $ show e
 
+parseExpr :: Options -> Tokens -> EvalState ()
+parseExpr opts tkns = do
+  if optShowOutScan opts
+  then lift $ putStrLn $ show tkns
+  else return ()
+  either errParser (callEval opts) (parse pExpr "Std input" tkns)
 
-parseExpr :: Tokens -> EvalState ()
-parseExpr tkns = either errParser callEval (parse pExpr "Std input" tkns)
 
-
-process :: EvalState ()
-process = do
+process :: Options -> EvalState ()
+process opts = do
   lift $ hPutStr stdout "> "
   lift $ hFlush stdout
   l <- lift $ hGetLine stdin
   isEOF <- lift $ hIsEOF stdin
   if isEOF || null l
    then lift $ exitSuccess
-   else do either errParser parseExpr ( parse pTokens "Std input" l)
-           process
+   else do either errParser (parseExpr opts) (parse pTokens "Std input" l)
+           process opts
 
-runEval :: IO ()
-runEval = evalStateT process 0
+runEval :: Options ->IO ()
+runEval opts = evalStateT process 0
