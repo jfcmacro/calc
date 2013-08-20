@@ -32,8 +32,8 @@ evalExpr2 op lexpr rexpr = do l <- evalExpr lexpr
 callEval :: Options -> Expr -> EvalState ()
 callEval opts expr = do
   if optShowOutParser opts
-  then lift $ putStrLn $ show expr
-  else return () 
+   then  lift $ putStrLn $ show expr
+   else return () 
   put 0
   r <- evalExpr expr
   lift $ hPutStrLn stdout $ show r
@@ -44,8 +44,9 @@ errParser e = lift $ hPutStrLn stderr $ show e
 parseExpr :: Options -> Tokens -> EvalState ()
 parseExpr opts tkns = do
   if optShowOutScan opts
-  then lift $ putStrLn $ show tkns
-  else return ()
+   then do 
+     lift $ putStrLn $ show tkns
+   else return ()
   either errParser (callEval opts) (parse pExpr "Std input" tkns)
 
 
@@ -61,4 +62,4 @@ process opts = do
            process opts
 
 runEval :: Options ->IO ()
-runEval opts = evalStateT process 0
+runEval opts = evalStateT (process opts) 0

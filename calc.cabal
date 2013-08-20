@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                calc
-version:             0.1.0.3
+version:             0.1.0.4
 synopsis:            Another calculator interpreter
 -- description:         
 homepage:            http://www1.eafit.edu.co/fcardona
