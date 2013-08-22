@@ -44,6 +44,8 @@ main = do
   (opts, fls) <- (getArgs >>= compilerOpts)
   if (optShowHelp opts)
    then hPutStrLn stdout $ usageInfo helpHeader options
-   else runEval opts
+   else if (optShowVersion opts)
+        then hPutStrLn stdout $ "calc version: " ++ (showVersion version)
+        else runEval opts
 
   

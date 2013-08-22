@@ -6,29 +6,33 @@ import Text.Parsec.Combinator
 import Language.Calc.Token
 import Language.Calc.Expr
 import Language.Calc.Scanner
+import Control.Applicative((<$),(<$>),(<**>),(<*))
 
 type Parser = Parsec Tokens ()
+
+pProg :: Parser Expr
+pProg = pExpr <* pEOF
 
 pExpr :: Parser Expr
 pExpr = pTerm `chainl1` pOperSum
 
 pTerm :: Parser Expr
-pTerm = pFact `chainl1` pOperMult
+pTerm = pStorable `chainl1` pOperMult
 
 pOperSum = pOper charOperSum
 
 pOperMult = pOper charOperMult
 
+pStorable :: Parser Expr
+pStorable = pFact <**> option id pStore
+
 pFact :: Parser Expr
-pFact =  do i <- pInt
-            let r = EInt i
-            option r (pStore >> (return $ EStore r))
+pFact =  EInt <$> pInt
          <|>
-         do pRead
-            return $ ERead
+         ERead <$ pRead
          <|>
          do e <- between pOpenPar pClosePar pExpr
-            option e (pStore >> (return $ EStore e))
+            option e (EStore e <$ pStore)
 
 calcToken :: (Tok -> Maybe a) -> Parser a
 calcToken test = token showToken posToken testToken
@@ -36,14 +40,19 @@ calcToken test = token showToken posToken testToken
          posToken  (pos,tok) = pos
          testToken (pos,tok) = test tok
 
+pEOF :: Parser ()
+pEOF = calcToken (\tok -> case tok of
+                             TknEOF -> Just ()
+                             other  -> Nothing)
+       
 pInt :: Parser Int
 pInt = calcToken (\tok -> case tok of
                              TknInt i -> Just i
                              other    -> Nothing)
 
-pStore :: Parser ()
+pStore :: Parser (Expr -> Expr)
 pStore = calcToken (\tok -> case tok of 
-                              TknSMem -> Just ()
+                              TknSMem -> Just $ EStore
                               other   -> Nothing)
 
 pRead :: Parser ()

@@ -8,6 +8,7 @@ import Language.Calc.Options
 import Control.Monad
 import Control.Monad.State
 import System.IO(hPutStrLn, hPutStr, hFlush, hIsEOF, hGetLine, stdout, stderr, stdin)
+import System.IO.Error(catchIOError, IOError(..), isEOFError)
 import System.Exit(exitSuccess)
 import Text.Parsec
 
@@ -47,19 +48,21 @@ parseExpr opts tkns = do
    then do 
      lift $ putStrLn $ show tkns
    else return ()
-  either errParser (callEval opts) (parse pExpr "Std input" tkns)
-
+  either errParser (callEval opts) (parse pProg "Std input" tkns)
 
 process :: Options -> EvalState ()
 process opts = do
-  lift $ hPutStr stdout "> "
-  lift $ hFlush stdout
-  l <- lift $ hGetLine stdin
-  isEOF <- lift $ hIsEOF stdin
-  if isEOF || null l
-   then lift $ exitSuccess
+  lift $ hPutStr stdout "> " >> hFlush stdout
+  l <- lift $ catchIOError (hGetLine stdin) testError
+  if null l
+   then lift $ hPutStrLn stdout "" >> exitSuccess
    else do either errParser (parseExpr opts) (parse pTokens "Std input" l)
            process opts
+
+testError :: IOError -> IO String
+testError e = if isEOFError e
+               then return $ ""
+               else ioError e
 
 runEval :: Options ->IO ()
 runEval opts = evalStateT (process opts) 0

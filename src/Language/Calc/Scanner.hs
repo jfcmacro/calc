@@ -17,7 +17,11 @@ pTokens = do l <- pToken
              return $ l++[(ini, TknEOF)]
 
 pToken :: Parser [Token]
-pToken =  sepBy  (choice [pTknInt, pTknOp, pTknMem, pTknOPar, pTknCPar]) spaces
+pToken =  endBy  (choice [pTknInt
+                         ,pTknOp
+                         ,pTknMem
+                         ,pTknOPar
+                         ,pTknCPar]) spaces
                  
 pTknInt :: Parser Token
 pTknInt = do ini <- getPos 
@@ -54,7 +58,7 @@ pTknCPar = do ini <- getPos
               return $ (ini, TknCPar)
 
 pTknEOF :: Parser Token
-pTknEOF = do ini <- getPos 
+pTknEOF = do ini <- getPos
              eof
              return $ (ini, TknEOF)
 
