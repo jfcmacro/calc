@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                calc
-version:             0.9.0.5
+version:             0.9.0.6
 synopsis:            Another calculator interpreter
 -- description:         
 homepage:            http://www1.eafit.edu.co/fcardona
@@ -20,7 +20,7 @@ executable calc
   hs-source-dirs:      src
   other-modules:       Language.Calc.Expr, Language.Calc.Token, 
                        Language.Calc.Scanner, Language.Calc.Parser,
-                       Language.Calc.Options
+                       Language.Calc.Options, Language.Calc.Eval
   build-depends:       base >=4.5, parsec >= 3.1, mtl >= 2.1
 
 source-repository head
